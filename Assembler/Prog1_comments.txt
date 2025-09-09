@@ -1,0 +1,72 @@
+PC 0: 101000000	// LI R0 0
+PC 1: 101001000	// LI R1 0
+PC 2: 101010000	// LI R2 0
+PC 3: 101011000	// LI R3 0
+PC 4: 101100000	// LI R4 0
+PC 5: 101101000	// LI R5 0
+PC 6: 101110000	// LI R6 0
+PC 7: 101111000	// LI R7 0
+PC 8: 110000000	// LD R0 0  //Low
+PC 9: 110100001	// LD R1 1  //high
+PC 10: 010010000	// MOV R2 R0 //low
+PC 11: 010011001	// MOV R3 R1 //high
+PC 12: 100010010	// BEQZ R2 2   //if low word is 0 check high, zerocheck
+PC 13: 011100000	// J notzero   //if not skip
+PC 14: 100011010	// BEQZ R3 2   //low and high is 0 store 0.
+PC 15: 011100000	// J notzero
+PC 16: 101000000	// LI R0 0  //zero store
+PC 17: 111000011	// STR R0 3
+PC 18: 111000010	// STR R0 2
+PC 19: 011100001	// J done
+PC 20: 110010001	// LD R0 17  //mask1 = 1000 0000
+PC 21: 000000011	// AND R0 R3  //get MSB in R0
+PC 22: 111000101	// STR R0 5  //STORING SIGN IN MEM
+PC 23: 100000010	// BEQZ R0 2    // if MSB is 0, skip 2's complement conversion
+PC 24: 011100010	// J neg         //will jump across skipNeg (line 15)
+PC 25: 011100011	// J skipNeg   //will skip 2's complement (line 25)
+PC 26: 110010010	// LD R0 18   //mask2 = 1111 1111,  neg
+PC 27: 101100001	// LI R4 1    //to add 1
+PC 28: 101101000	// LI R5 0    //placeholder
+PC 29: 001101100	// XOR R3 R0  //inverting bits of high word
+PC 30: 001101000	// XOR R2 R0  //inverting bits of low word
+PC 31: 000110010	// ADD R4 R2  //adding 1 to low word  R4 has low word
+PC 32: 000110111	// ADD R5 R3  //adding with 0, but catching any overflow from previous instruction  R5 has high word
+PC 33: 010010100	// MOV R2 R4  //Moving low/high word back into R2 for consistency  
+PC 34: 010011101	// MOV R3 R5  
+PC 35: 101111000	// LI R7 0    //skipNeg, initialize shift amount counter
+PC 36: 010001011	// MOV R1 R3  //moving high word into R1, loop start
+PC 37: 110010001	// LD R0 17   //mask 1 1000 0000
+PC 38: 000000100	// AND R1 R0  //gettng MSB 
+PC 39: 001000100	// SUB R1 R0  //seeing if MSB is 1 (10000000 -10000000 = 0)
+PC 40: 100001110	// BEQZ R1 6  //if its 1, conclude loop
+PC 41: 010101000	// SH R2 0 0  //SHL low word
+PC 42: 010101101	// SH R3 0 1  //SHL high word
+PC 43: 110010110	// LD R0 22    //increment val 1 (need to load from mem to not clear flags)
+PC 44: 000111100	// ADD R7 R0  //increase shift amount by 1 
+PC 45: 011100100	// J loop   //to line 26
+PC 46: 110010011	// LD R0 19  //the value of 22, 00010110, conclude loop location
+PC 47: 010001111	// MOV R1 R7  //R1 has shift amount to get 1 to MSB
+PC 48: 001000001	// SUB R0 R1  //R0 has exp of floating point
+PC 49: 111000110	// STR R0 6   //STORING EXPONENT IN MEM[6]
+PC 50: 110010100	// LD R0 20  //mask3 0111 1111
+PC 51: 110110101	// LD R1 21  //mask4 1110 0000  masks need to get mantissa bits
+PC 52: 000001100	// AND R3 R0  //high mask
+PC 53: 000001001	// AND R2 R1  //low mask
+PC 54: 101110101	// LI R6 5  //setting up shift right 5 times
+PC 55: 101001001	// LI R1 1  //decrement
+PC 56: 010101111	// SH R3 1 1 //SHR high
+PC 57: 010101010	// SH R2 1 0 //SHR low
+PC 58: 001011001	// SUB R6 R1 // decrement by 1
+PC 59: 100110010	// BEQZ R6 2  //skip loop if 5->0
+PC 60: 011100101	// J loop2  //to line 50                   CHANGE TO MANUAL SHIFTS IF NEEDED
+PC 61: 101111000	// LI R7 0 // NOP to clear any shift carry flags from before
+PC 62: 110000110	// LD R0 6  //loading EXPONENT
+PC 63: 010100001	// SH R0 0 1 //SHL high, twice to align exponent bits
+PC 64: 010100001	// SH R0 0 1 
+PC 65: 110100101	// LD R1 5 //loading SIGN, bit already aligned cuz not shifted
+PC 66: 000100001	// ADD R0 R1  //adding sign and exponent
+PC 67: 000100011	// ADD R0 R3  //R3 has two bits of mantissa, MSW complete
+PC 68: 111000011	// STR R0 3    //MSW in location 3
+PC 69: 010001010	// MOV R1 R2   //last 8 bits of mantissa in storeable reg
+PC 70: 111100010	// STR R1 2    //LSW in location 2
+PC 71: 101111000	// LI R7 0  //ASSIGN DONE TO THIS INSTRUCTION 

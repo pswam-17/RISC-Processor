@@ -1,0 +1,9 @@
+mantissaAdjust 56
+shiftm2 61
+loop 66
+shiftm1 76
+loop2 81
+skip 90
+bitAdj 104
+preEnd 120
+ENDSTORE 127

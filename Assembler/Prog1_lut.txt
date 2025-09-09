@@ -1,0 +1,6 @@
+notzero 20
+neg 26
+skipNeg 35
+loop 36
+loop2 56
+done 71

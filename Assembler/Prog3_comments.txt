@@ -1,0 +1,140 @@
+PC 0: 101000000	// LI R0 0
+PC 1: 101001000	// LI R1 0
+PC 2: 101010000	// LI R2 0
+PC 3: 101011000	// LI R3 0
+PC 4: 101100000	// LI R4 0
+PC 5: 101101000	// LI R5 0
+PC 6: 101110000	// LI R6 0
+PC 7: 101111000	// LI R7 0
+PC 8: 110001000	// LD R0 8   //low word 1 
+PC 9: 110101001	// LD R1 9  //high word 1
+PC 10: 010010000	// MOV R2 R0  //low 1
+PC 11: 010011001	// MOV R3 R1  //high 1
+PC 12: 110010001	// LD R0 17   //mask 1000 0000 for sign
+PC 13: 000000011	// AND R0 R3  //R0 has sign 
+PC 14: 111000000	// STR R0 0    //SIGN STORED IN MEM[0]
+PC 15: 110010010	// LD R0 18   //mask 2 0111 1100  for exponent 1
+PC 16: 000000011	// AND R0 R3  //R0 has exp1
+PC 17: 010100010	// SH R0 1 0  
+PC 18: 010100010	// SH R0 1 0  //aligning exponent1 for true value
+PC 19: 111000001	// STR R0 1    //EXP1 STORED IN MEM[1]
+PC 20: 101111000	// LI R7 0    //NOP, clearing flags
+PC 21: 110010011	// LD R0 19   //00000011 for high word mantissa bits
+PC 22: 110110100	// LD R1 20   //00000100  PREPEND 1 to mantissa
+PC 23: 000000011	// AND R0 R3  //mantissa bits gotten
+PC 24: 000100001	// ADD R0 R1  //prepended 1 to mantissa bits
+PC 25: 111000010	// STR R0 2    //MANTISSA HIGH1 STORED IN MEM[2]
+PC 26: 110010101	// LD R0 21   //11111111 for low word mantissa bits
+PC 27: 000000010	// AND R0 R2  //Low bits gotten
+PC 28: 111000011	// STR R0 3    //MANTISSA LOW1 STORED IN MEM[3]
+PC 29: 101111000	// LI R7 0   //clearing flags before next load and store procedure 
+PC 30: 110001010	// LD R0 10   //low word 2 
+PC 31: 110101011	// LD R1 11  //high word 2
+PC 32: 010010000	// MOV R2 R0  //low 2
+PC 33: 010011001	// MOV R3 R1  //high 2
+PC 34: 110010010	// LD R0 18   //mask 2 0111 1100  for exponent 2
+PC 35: 000000011	// AND R0 R3  //R0 has exp2
+PC 36: 010100010	// SH R0 1 0  
+PC 37: 010100010	// SH R0 1 0  //aligning exponent2 for true value
+PC 38: 111000100	// STR R0 4    //EXP1 STORED IN MEM[4]
+PC 39: 101111000	// LI R7 0    //NOP, clearing flags
+PC 40: 110010011	// LD R0 19   //00000011 for high word mantissa bits
+PC 41: 110110100	// LD R1 20   //00000100  PREPEND 1 to mantissa
+PC 42: 000000011	// AND R0 R3  //mantissa bits gotten
+PC 43: 000100001	// ADD R0 R1  //prepended 1 to mantissa bits
+PC 44: 111000101	// STR R0 5    //MANTISSA HIGH2 STORED IN MEM[5]
+PC 45: 110010101	// LD R0 21   //11111111 for low word mantissa bits
+PC 46: 000000010	// AND R0 R2  //Low bits gotten
+PC 47: 111000110	// STR R0 6    //MANTISSA LOW2 STORED IN MEM[6]
+PC 48: 110000001	// LD R0 1    //EXPONENT 1
+PC 49: 110100100	// LD R1 4    //EXPONENT 2
+PC 50: 010010000	// MOV R2 R0  //exp1
+PC 51: 010011001	// MOV R3 R1  //exp2
+PC 52: 001101011	// XOR R2 R3    //if 0, exponents are equal
+PC 53: 100010010	// BEQZ R2 2    //skip mantissa adjusting if exponents are equal
+PC 54: 011100000	// J mantissaAdjust 
+PC 55: 011100001	// J skip
+PC 56: 010010000	// MOV R2 R0    //restoring exp1 val to R2, mantissaAdjust
+PC 57: 011001011	// GT R2 R3     //is exp1 > exp2
+PC 58: 100010010	// BEQZ R2 2    //if exp1 < exp2
+PC 59: 011100010	// J shiftm2    //2 lines down
+PC 60: 011100011	// J shiftm1    //skip shiftm2 stuff, conditional else
+PC 61: 010010000	// MOV R2 R0    //Exponent 1, shiftm2
+PC 62: 001001011	// SUB R2 R3    //R2 is now loop counter
+PC 63: 101011001	// LI R3 1      //loop decrement
+PC 64: 110000101	// LD R0 5      //MANTISSA HIGH 2   
+PC 65: 110100110	// LD R1 6      //MANTISSA LOW 2
+PC 66: 010100011	// SH R0 1 1    //SHR high, loop
+PC 67: 010100110	// SH R1 1 0    //SHR low
+PC 68: 111000101	// STR R0 5      //mantissa high 2
+PC 69: 111100110	// STR R1 6      //mantissa low 2
+PC 70: 001001011	// SUB R2 R3    //loop counter - 1
+PC 71: 100010010	// BEQZ R2 2    //check loop counter, if zero go to skip
+PC 72: 011100100	// J loop       //if not zero continue
+PC 73: 110000001	// LD R0 1      //loading exponent1 to replace useless exp2 
+PC 74: 111000100	// STR R0 4      //both exponents now equal to higher value
+PC 75: 011100001	// J skip
+PC 76: 010010000	// MOV R2 R0    //exponent 1, shiftm1
+PC 77: 001001110	// SUB R3 R2    //R3 is loop counter
+PC 78: 101010001	// LI R2 1      //loop decrement
+PC 79: 110000010	// LD R0 2      //MANTISSA HIGH 1   
+PC 80: 110100011	// LD R1 3      //MANTISSA LOW 1
+PC 81: 010100011	// SH R0 1 1    //SHR high, loop2
+PC 82: 010100110	// SH R1 1 0    //SHR low
+PC 83: 111000010	// STR R0 2     //mantissa high 1
+PC 84: 111100011	// STR R1 3     //mantissa low 1
+PC 85: 001001110	// SUB R3 R2    //loop counter - 1
+PC 86: 100011010	// BEQZ R3 2    //check loop counter, if zero go to skip
+PC 87: 011100101	// J loop2
+PC 88: 110000100	// LD R0 4     //loading exponent2 to replace useless exp1
+PC 89: 111000001	// STR R0 1     //both exponents now equal to higher value
+PC 90: 101111000	// LI R7 0   //Jump location skip, clear Flags
+PC 91: 110000011	// LD R0 3   //loading MANTISSA LOW 1
+PC 92: 110100110	// LD R1 6   //loading MANTISSA LOW 2
+PC 93: 000111100	// ADD R7 R0  //R7 has mantissa low 1
+PC 94: 000111101	// ADD R7 R1  //R7 has sum of the low words for mantissa, overflow if any is caught
+PC 95: 110000010	// LD R0 2    //loading MANTISSA HIGH 1
+PC 96: 110100101	// LD R1 5    //loading MANTISSA HIGH 2
+PC 97: 000100001	// ADD R0 R1  //R0 has sum of high word mantissa bits, overflow automatically added on
+PC 98: 010010000	// MOV R2 R0  //R2 has ^^
+PC 99: 110010110	// LD R0 22    //mask 00001000, to catch 12th bit 
+PC 100: 000000010	// AND R0 R2   //catching 12th bit 
+PC 101: 100000010	// BEQZ R0 2      //if 12th bit is zero, skip all this
+PC 102: 011100110	// J bitAdj       //2 lines down
+PC 103: 011100111	// J preEnd
+PC 104: 110010111	// LD R0 23    //bitAdj, mask 00000111 for high bits of summed mantissa
+PC 105: 000001000	// AND R2 R0   //get first 3 bits of mantissa, store in R2 (NEED TO STORE)
+PC 106: 110011000	// LD R0 24    //mask 11111110 for low bits of summed mantissa 
+PC 107: 000011100	// AND R7 R0   //get last 7 bits of mantissa, store in R7 (NEED TO STORE)
+PC 108: 101110001	// LI R6 1     //clear flags, one for adding to exponent
+PC 109: 010101011	// SH R2 1 1   //SHR high
+PC 110: 010111110	// SH R7 1 0   //SHR low, shift one to align mantissa bits
+PC 111: 110000001	// LD R0 1     //exponent 1 (same at this point)
+PC 112: 000111000	// ADD R6 R0   //Add 1 to exponent
+PC 113: 010000110	// MOV R0 R6
+PC 114: 111000001	// STR R0 1     //adjusted exponent stored back in MEM[1]
+PC 115: 010000010	// MOV R0 R2   //preparing MANTISSA HIGH BITS for store
+PC 116: 111001111	// STR R0 15    //in MEM[15]
+PC 117: 010000111	// MOV R0 R7   //preparing MANTISSA LOW BITS for store
+PC 118: 111001110	// STR R0 14    //in MEM[14]
+PC 119: 011101000	// J ENDSTORE
+PC 120: 110010011	// LD R0 19   //preEnd, mask 00000011 for high bits of summed mantissa
+PC 121: 000000010	// AND R0 R2  //2 high bits gotten
+PC 122: 111001111	// STR R0 15   //MANTISSA HIGH BITS in MEM[15]
+PC 123: 110010101	// LD R0 21   //mask 11111111 for low bits of summed mantissa
+PC 124: 000011100	// AND R7 R0  //8 low bits gotten
+PC 125: 010000111	// MOV R0 R7  
+PC 126: 111001110	// STR R0 14   //MANTISSA LOW BITS in MEM[14]
+PC 127: 101111000	// LI R7 0    //ENDSTORE, Mantissa high in 15, low in 14, exponent in 1, sign in 0, clear flags
+PC 128: 110001110	// LD R0 14   //MANTISSA low bits, also LSW of answer
+PC 129: 111001100	// STR R0 12   //stored LSW
+PC 130: 110000001	// LD R0 1    //exponent
+PC 131: 010100001	// SH R0 0 1  //SHL high, for exponent alignment twice
+PC 132: 010100001	// SH R0 0 1 
+PC 133: 010010000	// MOV R2 R0  //R2 has exponent value
+PC 134: 110001111	// LD R0 15   //MANTISSA high bits 
+PC 135: 110100000	// LD R1 0    //sign of final value
+PC 136: 000100010	// ADD R0 R2  //Mantissa high bits + exponent(Shifted)
+PC 137: 000100001	// ADD R0 R1  //^^^ + sign bit, MSW constructed
+PC 138: 111001101	// STR R0 13   //stored MSW
+PC 139: 101111000	// LI R7 0    //END; ASSIGN DONE TO THIS INSTRUCTION

@@ -1,0 +1,91 @@
+PC 0: 101000000	// LI R0 0
+PC 1: 101001000	// LI R1 0
+PC 2: 101010000	// LI R2 0
+PC 3: 101011000	// LI R3 0
+PC 4: 101100000	// LI R4 0
+PC 5: 101101000	// LI R5 0
+PC 6: 101110000	// LI R6 0
+PC 7: 101111000	// LI R7 0
+PC 8: 110000100	// LD R0 4  //Low
+PC 9: 110100101	// LD R1 5  //high
+PC 10: 010010000	// MOV R2 R0 //low
+PC 11: 010011001	// MOV R3 R1  //high
+PC 12: 110010001	// LD R0 17  //1000 0000 mask
+PC 13: 000000011	// AND R0 R3   //sign
+PC 14: 111001010	// STR R0 10    //SIGN STORED IN 10
+PC 15: 110010010	// LD R0 18   //0111 1100 exp mask
+PC 16: 000000011	// AND R0 R3   //exponent  not shifted
+PC 17: 010100010	// SH R0 1 0   
+PC 18: 010100010	// SH R0 1 0   //aligning exponent bits for true value
+PC 19: 111001101	// STR R0 13    //STORING EXPONENT in case
+PC 20: 010001000	// MOV R1 R0   //R1 has EXPONENT value
+PC 21: 110010011	// LD R0 19   //0000 0011 mantissa high word 2 bits
+PC 22: 000000011	// AND R0 R3   //2 mantissa bits
+PC 23: 111001011	// STR R0 11    //MANTISSA HIGH BITS STORED IN 11
+PC 24: 110010100	// LD R0 20   //1111 1111 mantissa low bits
+PC 25: 000000010	// AND R0 R2  //mantissa low 8
+PC 26: 111001100	// STR R0 12   //MANTISSA LOW BITS STORED IN 12
+PC 27: 010010001	// MOV R2 R1   //saving copy of exponent
+PC 28: 110010101	// LD R0 21    //value of 22, 00010110
+PC 29: 011000100	// GT R1 R0    //is exp greater than 22?
+PC 30: 100001010	// BEQZ R1 2      //if not greater than 22, skip past this
+PC 31: 011100000	// J beginCond    //beginCond
+PC 32: 011100001	// J skip
+PC 33: 110101010	// LD R1 10    //loading sign, beginCond
+PC 34: 100001010	// BEQZ R1 2    //if sign is 0
+PC 35: 011100010	// J sign1      //sign is negative jump
+PC 36: 110010110	// LD R0 22     //0111 1111 max pos val high
+PC 37: 111000111	// STR R0 7      //STR MSW
+PC 38: 110010100	// LD R0 20      //1111 1111 max pos val low
+PC 39: 111000110	// STR R0 6      //STR LSW
+PC 40: 011100011	// J END         // JUMP TO END
+PC 41: 110010001	// LD R0 17     //1000 0000 sign1, max neg val high
+PC 42: 111000111	// STR R0 7      //STR MSW
+PC 43: 101000000	// LI R0 0      //0000 0000 max neg val low
+PC 44: 111000110	// STR R0 6      //STR LSW
+PC 45: 011100011	// J END         // JUMP TO END
+PC 46: 100010010	// BEQZ R2 2    //skip location jump, checking if exponent is 0
+PC 47: 011100100	// J beginElse   //if neither of these scenarios jump to beginning of actual program
+PC 48: 101000000	// LI R0 0       //load val
+PC 49: 111000111	// STR R0 7
+PC 50: 111000110	// STR R0 6   //Store all 0's to MEM
+PC 51: 011100011	// J END      //JUMP TO END
+PC 52: 110001011	// LD R0 11   // beginElse, load in mantissas to do math (high)
+PC 53: 010011000	// MOV R3 R0 //Move to R3
+PC 54: 110001100	// LD R0 12   //low bits mantissa
+PC 55: 010010000	// MOV R2 R0  //Move to R2 low
+PC 56: 110001101	// LD R0 13   //exponent loading
+PC 57: 010001000	// MOV R1 R0   //moving exponent to R1
+PC 58: 101111000	// LI R7 0     //NOP clearing garbage flags
+PC 59: 110010111	// LD R0 23    //00000100  -> prepended 1 to mantissa bits mask
+PC 60: 000101100	// ADD R3 R0    //has mantissa high bits, with 1 prepend
+PC 61: 110011000	// LD R0 24     //00001111, value 15 for shift amount
+PC 62: 001000100	// SUB R1 R0    //Exponent - 15, result store in R1
+PC 63: 010101111	// SH R3 1 1    //SHR high word
+PC 64: 010101010	// SH R2 1 0    //SHR low
+PC 65: 010101111	// SH R3 1 1    //SHR high word
+PC 66: 010101010	// SH R2 1 0    //SHR low  (2 times to align radix)
+PC 67: 101000001	// LI R0 1    //Clear flags and decrement value; R1 has amt of times to shift
+PC 68: 100001101	// BEQZ R1 5  //if shift amount is 0, skip all this
+PC 69: 010101000	// SH R2 0 0    //shift left low word
+PC 70: 010101101	// SH R3 0 1    //shift left high word
+PC 71: 001000100	// SUB R1 R0 
+PC 72: 011100101	// J  shift    //line BEQZ
+PC 73: 101111000	// LI R7 0    //clear flags and placeholder
+PC 74: 110001010	// LD R0 10   //loading sign
+PC 75: 100000010	// BEQZ R0 2    //can skip bit inversion if 0 (positive)
+PC 76: 011100110	// J bitInv     //jump 2 lines down
+PC 77: 011100111	// J storingMem   
+PC 78: 101110001	// LI R6 1     //add 1 val
+PC 79: 110110100	// LD R1 20    //1111 1111 XOR mask
+PC 80: 001101101	// XOR R3 R1   //invert bits of high word
+PC 81: 001101001	// XOR R2 R1   //invert bits of low word
+PC 82: 000111010	// ADD R6 R2   //R6 has low word (with one added, overflow caught)
+PC 83: 000111111	// ADD R7 R3   //R3 is added with 0, such that overflow if needed can carry over
+PC 84: 010010110	// MOV R2 R6
+PC 85: 010011111	// MOV R3 R7   //moving back into R3 and R2 (high low) for consistency
+PC 86: 010000010	// MOV R0 R2   //storingMem, preparing to store low
+PC 87: 111000110	// STR R0 6     //storing LSW in mem[6]
+PC 88: 010000011	// MOV R0 R3   //high word
+PC 89: 111000111	// STR R0 7     //storing MSW in mem[7]
+PC 90: 101111000	// LI R7 0     //END; ASSIGN DONE TO THIS INSTRUCTION

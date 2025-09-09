@@ -1,0 +1,8 @@
+beginCond 33
+sign1 41
+skip 46
+beginElse 52
+shift 68
+bitInv 78
+storingMem 86
+END 90

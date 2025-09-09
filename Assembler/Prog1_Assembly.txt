@@ -1,0 +1,95 @@
+//Resetting Registers
+LI R0 0
+LI R1 0
+LI R2 0
+LI R3 0
+LI R4 0
+LI R5 0
+LI R6 0
+LI R7 0
+
+// PROGRAM 1 - Loading operands
+LD R0 0  //Low
+LD R1 1  //high
+
+MOV R2 R0 //low
+MOV R3 R1 //high
+
+BEQZ R2 2   //if low word is 0 check high, zerocheck
+J notzero   //if not skip
+BEQZ R3 2   //low and high is 0 store 0.
+J notzero
+
+LI R0 0  //zero store
+STR R0 3
+STR R0 2
+J done
+
+notzero:
+LD R0 17  //mask1 = 1000 0000
+AND R0 R3  //get MSB in R0
+STR R0 5  //STORING SIGN IN MEM
+
+BEQZ R0 2    // if MSB is 0, skip 2's complement conversion
+J neg         //will jump across skipNeg (line 15)
+J skipNeg   //will skip 2's complement (line 25)
+
+neg:
+LD R0 18   //mask2 = 1111 1111,  neg
+LI R4 1    //to add 1
+LI R5 0    //placeholder
+XOR R3 R0  //inverting bits of high word
+XOR R2 R0  //inverting bits of low word
+ADD R4 R2  //adding 1 to low word  R4 has low word
+ADD R5 R3  //adding with 0, but catching any overflow from previous instruction  R5 has high word
+MOV R2 R4  //Moving low/high word back into R2 for consistency  
+MOV R3 R5  
+
+skipNeg:
+LI R7 0    //skipNeg, initialize shift amount counter
+loop:
+MOV R1 R3  //moving high word into R1, loop start
+LD R0 17   //mask 1 1000 0000
+AND R1 R0  //gettng MSB 
+SUB R1 R0  //seeing if MSB is 1 (10000000 -10000000 = 0)
+BEQZ R1 6  //if its 1, conclude loop
+SH R2 0 0  //SHL low word
+SH R3 0 1  //SHL high word
+LD R0 22    //increment val 1 (need to load from mem to not clear flags)
+ADD R7 R0  //increase shift amount by 1 
+J loop   //to line 26
+
+//R2 and R3 has vals, R7 has shift amount
+LD R0 19  //the value of 22, 00010110, conclude loop location
+MOV R1 R7  //R1 has shift amount to get 1 to MSB
+SUB R0 R1  //R0 has exp of floating point
+STR R0 6   //STORING EXPONENT IN MEM[6]
+
+LD R0 20  //mask3 0111 1111
+LD R1 21  //mask4 1110 0000  masks need to get mantissa bits
+AND R3 R0  //high mask
+AND R2 R1  //low mask
+
+LI R6 5  //setting up shift right 5 times
+LI R1 1  //decrement
+loop2:
+SH R3 1 1 //SHR high
+SH R2 1 0 //SHR low
+SUB R6 R1 // decrement by 1
+BEQZ R6 2  //skip loop if 5->0
+J loop2  //to line 50                   CHANGE TO MANUAL SHIFTS IF NEEDED
+
+LI R7 0 // NOP to clear any shift carry flags from before
+LD R0 6  //loading EXPONENT
+SH R0 0 1 //SHL high, twice to align exponent bits
+SH R0 0 1 
+LD R1 5 //loading SIGN, bit already aligned cuz not shifted
+ADD R0 R1  //adding sign and exponent
+ADD R0 R3  //R3 has two bits of mantissa, MSW complete
+STR R0 3    //MSW in location 3
+MOV R1 R2   //last 8 bits of mantissa in storeable reg
+STR R1 2    //LSW in location 2
+done:
+LI R7 0  //ASSIGN DONE TO THIS INSTRUCTION 
+
+
